@@ -1,36 +1,39 @@
 class Solution {
 public:
+    map<int,bool>st;
+    bool helper(long long pre, long long pos,map<pair<int,int>,bool>&dp, vector<int>arr, int n){
 
-    bool canCross(vector<int>& arr) {
-        int n = arr.size();
-        set<int>st;
-        map<int,set<int>>mp;
-        for(int i =0;i<n;i++){
-            mp[arr[i]]=st;
-        }
-        mp[0]={0};
-        for(int i =0;i<n;i++){
-            set<int>st=mp[arr[i]];
+           
+        
+        if(pos>arr[n-1] || st[pos]==false)return 0;
+        if(pos==arr[n-1])return true;
+        if(dp.find({pre,pos})!=dp.end())return dp[{pre,pos}];
 
-            for(auto& k:st){
-                if(mp.find(arr[i]+k)!=mp.end()){
-                    if(k>0){
-                        mp[arr[i]+k].insert(k);
-                    }
-                }
-                if(mp.find(arr[i]+k-1)!=mp.end()){
-                    if(k-1>0){
-                        mp[arr[i]+k-1].insert(k-1);
-                    }
-                }
-                if(mp.find(arr[i]+k+1)!=mp.end()){
-                    if(k+1>0){
-                        mp[arr[i]+k+1].insert(k+1);
-                    }
-                }
-            }
+        bool ok; 
+        if(pos==0){
+            ok= helper(1,pos+1,dp,arr,n);
         }
-        if(mp[arr[n-1]].size()==0)return false;
-        return true;
+        else{
+            if(pre-1>0)ok = helper(pre-1,pos+pre-1,dp,arr,n);
+            if(ok)return true;
+            ok = helper(pre,pos+pre,dp,arr,n);
+            if(ok)return true;
+            ok = helper(pre+1,pos+pre+1,dp,arr,n);
+            if(ok)return true;
+        }
+        dp[{pre,pos}]=ok;
+        return ok;
+    }
+    bool canCross(vector<int>& stones) {
+        int n = stones.size();
+        map<pair<int,int>,bool>dp;
+    
+        for(auto & i:stones){
+            st[i]=true;;
+        }
+
+        return helper(1,0,dp,stones,n);
+
+
     }
 };
